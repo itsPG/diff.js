@@ -1,0 +1,12 @@
+this is a sample
+diff test file
+old ver.
+
+Use it to
+test
+the
+js
+work
+
+or
+not.
