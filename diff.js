@@ -7,14 +7,89 @@ var diff = function()
 {
 	var r =
 	{
-		text_old: "",
-		text_new: "",
-		set:function(old_in, new_in)
+		text_src: "",
+		text_dst: "",
+		src_list: [],
+		dst_list: [],
+		hashed_src: [],
+		hashed_dst: [],
+		hash_table: [],
+		lookup_table: [],
+
+		set:function(src_in, dst_in)
 		{
-			this.text_old = old_in;
-			this.text_new = new_in;
-			console.log(this.text_old.split("\n"));
-			console.log(this.text_new.split("\n"));
+			this.text_src = src_in;
+			this.text_dst = dst_in;
+			this.src_list = this.text_src.split("\n");
+			this.dst_list = this.text_dst.split("\n");
+
+		},
+		diff:function(src_in, dst_in)
+		{
+			this.set(src_in, dst_in);
+			
+			for (var i = 0; i < this.src_list.length; i++)
+			{
+				this.hash_table[this.src_list[i]] = true;
+			}
+			for (var i = 0; i < this.dst_list.length; i++)
+			{
+				this.hash_table[this.dst_list[i]] = true;
+			}
+			console.log(this.hash_table);
+			var count = 0;
+			for (var key in this.hash_table)
+			{
+				this.hash_table[key] = ++count;
+			}
+			
+			for (var key in this.hash_table)
+			{
+				this.lookup_table[this.hash_table[key]] = key;
+
+			}
+			console.log(this.hash_table);
+			for (var i = 0; i < this.src_list.length; i++)
+			{
+				this.hashed_src[i] = this.hash_table[this.src_list[i]];
+			}
+			for (var i = 0; i < this.dst_list.length; i++)
+			{
+				this.hashed_dst[i] = this.hash_table[this.dst_list[i]];
+			}
+			console.log(this.hashed_src, this.hashed_dst);
+
+			var result = this.min_edit_distance(this.hashed_dst, this.hashed_src);
+			this.show_op_list(result, this.hashed_dst, this.hashed_src, this.lookup_table);
+		},
+		show_op_list:function(op_list, seq_a, seq_b, hash_table)
+		{
+			console.log("==Result==".cyan);
+			for (var i = 0; i < op_list.length; i++)
+			{
+				if (op_list[i].type == "add")
+				{
+					if (hash_table === undefined)
+						console.log("+".green, seq_a[op_list[i].line_no]);
+					else
+						console.log("+".green, hash_table[ seq_a[op_list[i].line_no] ] );
+
+				}
+				else if (op_list[i].type == "del")
+				{
+					if (hash_table === undefined)
+						console.log("-".red, seq_b[op_list[i].line_no]);
+					else
+						console.log("-".red, hash_table[ seq_b[op_list[i].line_no] ] );
+				}
+				else if (op_list[i].type == "nop")
+				{
+					if (hash_table === undefined)
+						console.log(" ".cyan, seq_a[op_list[i].line_no]);
+					else
+						console.log(" ".cyan, hash_table[ seq_a[op_list[i].line_no] ] );
+				}
+			}
 		},
 		min_edit_distance:function(seq_a, seq_b)
 		{
@@ -79,15 +154,15 @@ var diff = function()
 				{
 					dp[i][j] = 999999999;
 					trace[i][j] = 0;
-					if (dp[i][j-1] + add_cost < dp[i][j])
-					{
-						dp[i][j] = dp[i][j-1] + add_cost;
-						trace[i][j] = 1;
-					}
 					if (dp[i-1][j] + del_cost < dp[i][j])
 					{
 						dp[i][j] = dp[i-1][j] + del_cost;
 						trace[i][j] = 2;
+					}
+					if (dp[i][j-1] + add_cost < dp[i][j])
+					{
+						dp[i][j] = dp[i][j-1] + add_cost;
+						trace[i][j] = 1;
 					}
 					var tmp_sub_cost = seq_a[j] == seq_b[i] ? 0:sub_cost; 
 					if (dp[i-1][j-1] + tmp_sub_cost < dp[i][j])
@@ -115,7 +190,7 @@ var diff = function()
 					var b2 = b.type == "nop" ? 1:0;
 					return a2 > b2;
 				}
-				return a.line_no > b.line_no;
+				else return a.line_no - b.line_no;
 			}
 			for (var i = n,j = m; i > 0 || j > 0;)
 			{
@@ -146,25 +221,12 @@ var diff = function()
 					i--; j--;
 				}
 			}
+			//op_list.reverse();
 			op_list.sort(op_list_compare);
+			console.log("DEBUG".cyan);
 			console.log(op_list);
-			for (var i = 0; i < op_list.length; i++)
-			{
-
-				if (op_list[i].type == "add")
-				{
-					console.log("+".green, seq_a[op_list[i].line_no]);
-
-				}
-				else if (op_list[i].type == "del")
-				{
-					console.log("-".red, seq_b[op_list[i].line_no]);
-				}
-				else if (op_list[i].type == "nop")
-				{
-					console.log(" ".cyan, seq_a[op_list[i].line_no]);
-				}
-			}
+			this.show_op_list(op_list, seq_a, seq_b);
+			return op_list;
 
 
 		}
@@ -179,4 +241,5 @@ var PG = new diff;
 //PG.min_edit_distance([1,2,4,5], [1, 5, 6]);
 //PG.min_edit_distance([1,2,3,4], [1,2,4]);
 //PG.min_edit_distance([1,2,1,5], [1,2,3,4,5]);
-PG.min_edit_distance([1, 2, 3, 4, 5, 6, 7], [2, 1, 8, 9]);
+//PG.min_edit_distance([1, 2, 3, 4, 5, 6, 7], [2, 1, 8, 9]);
+PG.diff(text_old, text_new);
