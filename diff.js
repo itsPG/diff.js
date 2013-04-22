@@ -29,14 +29,27 @@ var diff = function()
 			var n = seq_b.length;
 			var dp = [], trace = [];
 			console.log(seq_a, seq_b);
+			seq_a.splice(0, 0, -1);
+			seq_b.splice(0, 0, -1);
 			var debug = function()
 			{
+				console.log("dp:".red);
 				for (var i = 0; i <= n; i++)
 				{
 					var tmp = "";
 					for (var j = 0; j <= m; j++)
 					{
 						tmp += dp[i][j] + " ";
+					}
+					console.log(tmp);
+				}
+				console.log("trace:".red);
+				for (var i = 0; i <= n; i++)
+				{
+					var tmp = "";
+					for (var j = 0; j <= m; j++)
+					{
+						tmp += trace[i][j] + " ";
 					}
 					console.log(tmp);
 				}
@@ -58,7 +71,7 @@ var diff = function()
 			}
 			var add_cost = 1;
 			var del_cost = 1;
-			var sub_cost = 1;
+			var sub_cost = 10000;
 			for (var i = 1; i <= n; i++)
 			{
 				for (var j = 1; j <= m; j++)
@@ -79,13 +92,39 @@ var diff = function()
 					if (dp[i-1][j-1] + tmp_sub_cost < dp[i][j])
 					{
 						dp[i][j] = dp[i-1][j-1] + tmp_sub_cost;
-						trace[i][j] = 3;
+						if (tmp_sub_cost == 0) trace[i][j] = 4;
+						else trace[i][j] = 3;
 					}
 
 				}
 			}
 			debug();
 			console.log("Ans: ".yellow, dp[n][m]);
+
+			for (var i = n,j = m; i > 0 && j > 0;)
+			{
+				console.log(i,j);
+				if (trace[i][j] == 1)
+				{
+					console.log( ("add " + seq_a[j]).green);
+					j--;
+				}
+				else if (trace[i][j] == 2)
+				{
+					console.log( ("del " + seq_b[i]).red);
+					i--;
+				}
+				else if (trace[i][j] == 3)
+				{
+					console.log( ("sub " + seq_b[i]).red);
+					i--; j--;
+				}
+				else if (trace[i][j] == 4)
+				{
+					console.log("nothing".cyan);
+					i--; j--;
+				}
+			}
 
 
 		}
@@ -97,6 +136,6 @@ var diff = function()
 
 var PG = new diff;
 //PG.set(text_old, text_new);
-PG.min_edit_distance([1,2,4,5], [3,5,1]);
+//PG.min_edit_distance([1,2,4,5], [3,5,1]);
 //PG.min_edit_distance([1,2,3,4], [1,3,4]);
-//PG.min_edit_distance([1,3,4], [1,4]);
+PG.min_edit_distance([1,3,4], [1,4]);
