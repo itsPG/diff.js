@@ -1,7 +1,7 @@
 var cs = require("colorplus").enable();
 var fs = require("fs");
-var text_old = fs.readFileSync("./oldtext.txt", "utf-8");
-var text_new = fs.readFileSync("./newtext.txt", "utf-8");
+var text_old = fs.readFileSync("./oldtext2.txt", "utf-8");
+var text_new = fs.readFileSync("./newtext2.txt", "utf-8");
 
 var diff = function()
 {
@@ -62,32 +62,51 @@ var diff = function()
 			var result = this.min_edit_distance(this.hashed_dst, this.hashed_src);
 			this.show_op_list(result, this.hashed_dst, this.hashed_src, this.lookup_table);
 		},
-		show_op_list:function(op_list, seq_a, seq_b, hash_table)
+		show_op_list:function(op_list, seq_a, seq_b, lookup_table)
 		{
 			console.log("==Result==".cyan);
+			if (lookup_table === undefined)
+			{
+				lookup_table = [];
+				var tmp_max = seq_a.length + seq_b.length;
+				
+				for (var i = 0; i <= tmp_max; i++)
+				{
+					lookup_table[i] = i;
+
+				}
+			}
+
+			var last_line_no = -1;
 			for (var i = 0; i < op_list.length; i++)
 			{
+				var line_no;
+				if (op_list[i].line_no > last_line_no)
+				{
+					last_line_no = op_list[i].line_no;
+					line_no = op_list[i].line_no + ". ";
+				}
+				else
+				{
+					line_no = "  ";
+				}
+				while (line_no.length < 5) line_no = " " + line_no;
+
 				if (op_list[i].type == "add")
 				{
-					if (hash_table === undefined)
-						console.log("+".green, seq_a[op_list[i].line_no]);
-					else
-						console.log("+".green, hash_table[ seq_a[op_list[i].line_no] ] );
+					var str = lookup_table[ seq_a[op_list[i].line_no] ];
+					console.log(line_no + "+".green, str);
 
 				}
 				else if (op_list[i].type == "del")
 				{
-					if (hash_table === undefined)
-						console.log("-".red, seq_b[op_list[i].line_no]);
-					else
-						console.log("-".red, hash_table[ seq_b[op_list[i].line_no] ] );
+					var str = lookup_table[ seq_b[op_list[i].line_no] ];
+					console.log(line_no + "-".red,  str);
 				}
 				else if (op_list[i].type == "nop")
 				{
-					if (hash_table === undefined)
-						console.log(" ".cyan, seq_a[op_list[i].line_no]);
-					else
-						console.log(" ".cyan, hash_table[ seq_a[op_list[i].line_no] ] );
+					var str = lookup_table[ seq_a[op_list[i].line_no] ];
+					console.log(line_no + " ".cyan, str);
 				}
 			}
 		},
@@ -215,7 +234,7 @@ var diff = function()
 			}
 
 			op_list.sort(op_list_compare);
-			this.show_op_list(op_list, seq_a, seq_b);
+			//this.show_op_list(op_list, seq_a, seq_b);
 			return op_list;
 
 		}
