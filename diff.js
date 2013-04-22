@@ -101,7 +101,7 @@ var diff = function()
 			debug();
 			console.log("Ans: ".yellow, dp[n][m]);
 
-			for (var i = n,j = m; i > 0 && j > 0;)
+			for (var i = n,j = m; i > 0 || j > 0;)
 			{
 				console.log(i,j);
 				if (trace[i][j] == 1)
@@ -136,6 +136,6 @@ var diff = function()
 
 var PG = new diff;
 //PG.set(text_old, text_new);
-//PG.min_edit_distance([1,2,4,5], [3,5,1]);
+PG.min_edit_distance([1,2,4,5], [1, 5, 6]);
 //PG.min_edit_distance([1,2,3,4], [1,3,4]);
-PG.min_edit_distance([1,3,4], [1,4]);
+//PG.min_edit_distance([1,2,1,5], [1,2,3,4,5]);
