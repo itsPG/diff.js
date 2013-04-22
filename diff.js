@@ -27,7 +27,7 @@ var diff = function()
 
 			var m = seq_a.length;
 			var n = seq_b.length;
-			var dp = [], trace = [];
+			var dp = [], trace = [], op_list = [];
 			console.log(seq_a, seq_b);
 			seq_a.splice(0, 0, -1);
 			seq_b.splice(0, 0, -1);
@@ -54,6 +54,7 @@ var diff = function()
 					console.log(tmp);
 				}
 			}
+
 			for (var i = 0; i <= n; i++)
 			{
 				dp[i] = [];
@@ -100,29 +101,68 @@ var diff = function()
 			}
 			debug();
 			console.log("Ans: ".yellow, dp[n][m]);
-
+			var push_op_list = function(type, line_no, line_no_2)
+			{
+				var tmp = {type:type, line_no:line_no, line_no_2:line_no_2};
+				op_list.push(tmp);
+				console.log(tmp);
+			}
+			var op_list_compare = function(a, b)
+			{
+				if (a.line_no == b.line_no)
+				{
+					var a2 = a.type == "nop" ? 1:0;
+					var b2 = b.type == "nop" ? 1:0;
+					return a2 > b2;
+				}
+				return a.line_no > b.line_no;
+			}
 			for (var i = n,j = m; i > 0 || j > 0;)
 			{
+
 				console.log(i,j);
 				if (trace[i][j] == 1)
 				{
 					console.log( ("add " + seq_a[j]).green);
+					push_op_list("add", j);
 					j--;
 				}
 				else if (trace[i][j] == 2)
 				{
 					console.log( ("del " + seq_b[i]).red);
+					push_op_list("del", i);
 					i--;
 				}
 				else if (trace[i][j] == 3)
 				{
 					console.log( ("sub " + seq_b[i]).red);
+					push_op_list("sub", i, j);
 					i--; j--;
 				}
 				else if (trace[i][j] == 4)
 				{
-					console.log("nothing".cyan);
+					console.log(("nothing" + seq_a[j]).cyan);
+					push_op_list("nop", j);
 					i--; j--;
+				}
+			}
+			op_list.sort(op_list_compare);
+			console.log(op_list);
+			for (var i = 0; i < op_list.length; i++)
+			{
+
+				if (op_list[i].type == "add")
+				{
+					console.log("+".green, seq_a[op_list[i].line_no]);
+
+				}
+				else if (op_list[i].type == "del")
+				{
+					console.log("-".red, seq_b[op_list[i].line_no]);
+				}
+				else if (op_list[i].type == "nop")
+				{
+					console.log(" ".cyan, seq_a[op_list[i].line_no]);
 				}
 			}
 
@@ -136,6 +176,7 @@ var diff = function()
 
 var PG = new diff;
 //PG.set(text_old, text_new);
-PG.min_edit_distance([1,2,4,5], [1, 5, 6]);
-//PG.min_edit_distance([1,2,3,4], [1,3,4]);
+//PG.min_edit_distance([1,2,4,5], [1, 5, 6]);
+//PG.min_edit_distance([1,2,3,4], [1,2,4]);
 //PG.min_edit_distance([1,2,1,5], [1,2,3,4,5]);
+PG.min_edit_distance([1, 2, 3, 4, 5, 6, 7], [2, 1, 8, 9]);
