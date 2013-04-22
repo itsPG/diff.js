@@ -36,7 +36,7 @@ var diff = function()
 			{
 				this.hash_table[this.dst_list[i]] = true;
 			}
-			console.log(this.hash_table);
+
 			var count = 0;
 			for (var key in this.hash_table)
 			{
@@ -48,7 +48,7 @@ var diff = function()
 				this.lookup_table[this.hash_table[key]] = key;
 
 			}
-			console.log(this.hash_table);
+
 			for (var i = 0; i < this.src_list.length; i++)
 			{
 				this.hashed_src[i] = this.hash_table[this.src_list[i]];
@@ -57,7 +57,7 @@ var diff = function()
 			{
 				this.hashed_dst[i] = this.hash_table[this.dst_list[i]];
 			}
-			console.log(this.hashed_src, this.hashed_dst);
+
 
 			var result = this.min_edit_distance(this.hashed_dst, this.hashed_src);
 			this.show_op_list(result, this.hashed_dst, this.hashed_src, this.lookup_table);
@@ -103,7 +103,7 @@ var diff = function()
 			var m = seq_a.length;
 			var n = seq_b.length;
 			var dp = [], trace = [], op_list = [];
-			console.log(seq_a, seq_b);
+
 			seq_a.splice(0, 0, -1);
 			seq_b.splice(0, 0, -1);
 			var debug = function()
@@ -174,13 +174,11 @@ var diff = function()
 
 				}
 			}
-			debug();
-			console.log("Ans: ".yellow, dp[n][m]);
+			
 			var push_op_list = function(type, line_no, line_no_2)
 			{
 				var tmp = {type:type, line_no:line_no, line_no_2:line_no_2};
 				op_list.push(tmp);
-				console.log(tmp);
 			}
 			var op_list_compare = function(a, b)
 			{
@@ -194,40 +192,31 @@ var diff = function()
 			}
 			for (var i = n,j = m; i > 0 || j > 0;)
 			{
-
-				console.log(i,j);
 				if (trace[i][j] == 1)
 				{
-					console.log( ("add " + seq_a[j]).green);
 					push_op_list("add", j);
 					j--;
 				}
 				else if (trace[i][j] == 2)
 				{
-					console.log( ("del " + seq_b[i]).red);
 					push_op_list("del", i);
 					i--;
 				}
 				else if (trace[i][j] == 3)
 				{
-					console.log( ("sub " + seq_b[i]).red);
 					push_op_list("sub", i, j);
 					i--; j--;
 				}
 				else if (trace[i][j] == 4)
 				{
-					console.log(("nothing" + seq_a[j]).cyan);
 					push_op_list("nop", j);
 					i--; j--;
 				}
 			}
-			//op_list.reverse();
+
 			op_list.sort(op_list_compare);
-			console.log("DEBUG".cyan);
-			console.log(op_list);
 			this.show_op_list(op_list, seq_a, seq_b);
 			return op_list;
-
 
 		}
 
@@ -237,9 +226,4 @@ var diff = function()
 }
 
 var PG = new diff;
-//PG.set(text_old, text_new);
-//PG.min_edit_distance([1,2,4,5], [1, 5, 6]);
-//PG.min_edit_distance([1,2,3,4], [1,2,4]);
-//PG.min_edit_distance([1,2,1,5], [1,2,3,4,5]);
-//PG.min_edit_distance([1, 2, 3, 4, 5, 6, 7], [2, 1, 8, 9]);
 PG.diff(text_old, text_new);
