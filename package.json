@@ -1,0 +1,25 @@
+{
+  "name": "diff.js",
+  "version": "0.1",
+  "author": "PG <smartPG@gmail.com>",
+  "description": "A simplified diff implementation in JavaScript. (by minimun edit distance dynamic programming)",
+
+  "main": "./colorplus.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:itsPG/diff.js.git"
+  },
+  "keywords": [
+    "color",
+    "plus",
+    "console",
+    "ansi"
+  ],
+  "dependencies" : {
+   "colorplus" : "*"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=0.6"
+  }
+}

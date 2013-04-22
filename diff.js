@@ -1,10 +1,16 @@
+/*
+	diff.js
+	A simplified diff implementation in JavaScript. (by minimun edit distance dynamic programming)
+	Copyright(C) 2013 by PG @ SENSE Lab
+	Released under the MIT license.
+
+	
+*/
 var cs = require("colorplus").enable();
 var fs = require("fs");
-var text_old = fs.readFileSync("./oldtext2.txt", "utf-8");
-var text_new = fs.readFileSync("./newtext2.txt", "utf-8");
-
-var diff = function()
+module.exports = (function()
 {
+	
 	var r =
 	{
 		text_src: "",
@@ -22,7 +28,10 @@ var diff = function()
 			this.text_dst = dst_in;
 			this.src_list = this.text_src.split("\n");
 			this.dst_list = this.text_dst.split("\n");
-
+			hashed_stc = [];
+			hashed_dst = [];
+			hash_table = [];
+			lookup_table = [];
 		},
 		diff:function(src_in, dst_in)
 		{
@@ -242,7 +251,5 @@ var diff = function()
 	}
 	return r;
 
-}
+})();
 
-var PG = new diff;
-PG.diff(text_old, text_new);
